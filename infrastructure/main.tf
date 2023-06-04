@@ -23,7 +23,7 @@ terraform {
 
 resource "digitalocean_app" "app" {
   spec {
-    name   = "matthorse"
+    name   = "horse"
     region = "syd"
 
     domain {
@@ -33,6 +33,9 @@ resource "digitalocean_app" "app" {
 
     static_site {
       name = "static"
+
+      environment_slug = "html"
+      source_dir       = "public"
 
       github {
         branch = "main"
