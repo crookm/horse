@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        background: #93c6d6;
+      }
+
+      .dino {
+        width: 80px;
+        position: absolute;
+        bottom: 25vh;
+        left: 50%;
+        z-index: 4;
+      }
+
+      .platform {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 25vh;
+        background-color: green;
+        z-index: 4;
+      }
+
+      .buttons a {
+        color: #000;
+      }
+
+      #container {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <img class="dino" src="dino.gif" />
+      <div class="platform"></div>
+    </div>
+    <div class="buttons" style="position: absolute; left: 10px; top: 10px">
+      <button id="pauseButton" style="margin-right: 8px">Pause</button>
+      <a href="https://mattcrook.io">matt</a> /
+      <a href="https://github.com/crookm/horse">github</a>
+    </div>
+
+    <script>
+      const mountainColors = ['#7ac1e4', '#429fd9', '#0077be', '#5ab25a'];
+      var isPaused = false;
+
+      document.getElementById("pauseButton").onclick = function () {
+        isPaused = !isPaused;
+        this.textContent = isPaused ? "Resume" : "Pause";
+      };
+
+      function createMountain(scale) {
+        var mountain = document.createElement("div");
+        mountain.className = "mountain";
+        mountain.style.position = "absolute";
+        mountain.style.bottom = "0";
+        mountain.style.borderLeft = `${scale * 150}px solid transparent`;
+        mountain.style.borderRight = `${scale * 150}px solid transparent`;
+        mountain.style.borderBottom = `${scale * 180}px solid #7ac1e4`;
+        mountain.style.zIndex = "1";
+
+        var mountainTop = document.createElement("div");
+        mountainTop.style.position = "absolute";
+        mountainTop.style.right = `${scale * -65}px`;
+        mountainTop.style.borderLeft = `${scale * 65}px solid transparent`;
+        mountainTop.style.borderRight = `${scale * 65}px solid transparent`;
+        mountainTop.style.borderBottom = `${scale * 77}px solid #ceeaf6`;
+        mountainTop.style.zIndex = "2";
+
+        var positions = [-55, -25, 5];
+
+        for (var i = 0; i < 3; i++) {
+          var mountainCap = document.createElement("div");
+          mountainCap.style.position = "absolute";
+          mountainCap.style.top = `${scale * 70}px`;
+          mountainCap.style.borderLeft = `${scale * 25}px solid transparent`;
+          mountainCap.style.borderRight = `${scale * 25}px solid transparent`;
+          mountainCap.style.borderTop = `${scale * 25}px solid #ceeaf6`;
+          mountainCap.style.left = `${scale * positions[i]}px`;
+          mountainTop.appendChild(mountainCap);
+        }
+
+        mountain.appendChild(mountainTop);
+        return mountain;
+      }
+
+      const mountainsContainer = document.getElementById("container");
+      const scales = [4, 3, 2, 2];
+      const speeds = [0.8, 1, 2, 6];
+      const lastMountain = [0, 0, 0, 0];
+      const frequencies = [0.3, 0.5, 0.8, 0.01];
+
+      const update = () => {
+        const now = Date.now();
+
+        for (let i = 0; i < 4; i++) {
+          if (!isPaused && now - lastMountain[i] > 4000 && Math.random() < frequencies[i]) {
+            const mountain = createMountain(scales[i]);
+
+            if (i < 3){
+                mountain.style.bottom = "25vh";
+            }
+
+            mountain.style.left = `${window.innerWidth}px`;
+            mountain.style.zIndex = `${i + 1}`;
+            mountain.dataset.index = i;
+            mountain.dataset.speed = speeds[i];
+            mountain.style.borderBottomColor = mountainColors[i];
+            mountainsContainer.appendChild(mountain);
+
+            lastMountain[i] = now;
+          }
+        }
+
+        document.querySelectorAll(".mountain").forEach((mountain) => {
+          if (!isPaused) {
+            mountain.style.left = `${
+              parseFloat(mountain.style.left) -
+              parseFloat(mountain.dataset.speed)
+            }px`;
+
+            if (parseFloat(mountain.style.left) < -window.innerWidth * 1.5) {
+              mountain.parentNode.removeChild(mountain);
+            }
+          }
+        });
+
+        requestAnimationFrame(update);
+      };
+
+      update();
+    </script>
+  </body>
+</html>
