@@ -23,7 +23,7 @@ terraform {
 
 resource "digitalocean_app" "app" {
   spec {
-    name   = "horse"
+    name   = "horse-prod-site-syd"
     region = "syd"
 
     domain {
